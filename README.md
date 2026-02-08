@@ -71,53 +71,49 @@ Steps to Run:
 
 1.	 Clone the repository:
 
-git clone https://github.com/xyz/Autonomous-Insurance-Claims-Processing-Agent.git
+   git clone https://github.com/xyz/Autonomous-Insurance-Claims-Processing-Agent.git
 
-cd Autonomous-Insurance-Claims-Processing-Agent
+   cd Autonomous-Insurance-Claims-Processing-Agent
 
 
-3.	Create and activate a virtual environment:
-Windows:
+2.	Create and activate a virtual environment:
+   
+   Windows:
 
-python -m venv venv
+      python -m venv venv
 
-venv\Scripts\activate
+      venv\Scripts\activate
 
-macOS / Linux:
+   macOS / Linux:
 
-python3 -m venv venv
+      python3 -m venv venv
 
-source venv/bin/activate
+      source venv/bin/activate
 
 
 3.	Install dependencies:
    
-pip install -r requirements.txt
+   pip install -r requirements.txt
 
 
-5.	Set environment variables:
+4.	Set environment variables:
    
-Create a .env file in the project root:
+   Create a .env file in the project root:
 
-OPENAI_API_KEY=”your_openai_api_key_here”
+   OPENAI_API_KEY=”your_openai_api_key_here”
 
-7.	Run the claims processing pipeline:
+5.	Run the claims processing pipeline:
    
-python src/routing.py
+   python src/routing.py
 
 
-9.	Project Structure:
+6.	Project Structure:
    
 ├── docs/                   # Input insurance documents (PDFs)
-
 ├── src/
-
 │   ├── code.py              # PDF text extraction logic
-
 │   ├── llm.py               # LLM prompt + extraction logic
-
 │   ├── routing.py           # Final validation & routing (ENTRY POINT)
-
 │   └── __pycache__/
 ├── .env.example             # Environment variable template
 ├── .gitignore
