@@ -6,11 +6,13 @@ The system is designed to be modular, extensible, and production-ready, followin
 The solution follows a three-step pipeline:
 
 Step 1: Document Text Extraction
+
 •	Insurance documents (PDFs) are processed using a PDF text extraction utility.
 
 •	The extracted raw text serves as input to the AI model.
 
 Step 2: AI-Based Information Extraction
+
 •	The extracted text is passed to a Large Language Model (LLM).
 
 •	A structured prompt enforces:
