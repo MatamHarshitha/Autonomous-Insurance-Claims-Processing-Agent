@@ -120,13 +120,9 @@ python src/routing.py
 
 │   └── __pycache__/
 ├── .env.example             # Environment variable template
-
 ├── .gitignore
-
 ├── README.md
-
 ├── requirements.txt
-
 └── venv/                    # Local virtual environment (ignored)
 
 
