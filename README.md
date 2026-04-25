@@ -104,6 +104,47 @@ The system expects the following core fields:
 - Estimated Damage
 
 ---
+project-AI/
+│
+├── claim_agent.py # Main processing logic
+├── extract_pdf.py # PDF text extraction
+├── config.py # Configuration settings
+├── .env # API keys (not pushed to GitHub)
+├── .gitignore
+└── README.md
+
+
+---
+
+##  Steps to Run
+
+### 1. Clone the repository
+    ```bash
+        git clone https://github.com/<your-username>/Autonomous-Insurance-Claims-Processing-Agent.git
+        cd Autonomous-Insurance-Claims-Processing-Agent```
+
+### 2. Create virtual environment
+      ```bash python -m venv .venv```
+      
+
+###3. Activate environment
+    Windows:
+    
+      ```bash
+            .venv\Scripts\activate```
+      
+    Mac/Linux:
+       ```source .venv/bin/activate```
+
+###4. Install dependencies
+      ```pip install -r requirements.txt```
+
+###5. Setup environment variables
+        Create a .env file in the root directory:
+          OPENAI_API_KEY=your_api_key_here
+    
+    
+      
 
 ## Installation
 
