@@ -160,10 +160,14 @@ The system expects the following core fields:
       python claim_agent.py
     
 ###7.Output Format
-    {
+
+{
   "extractedFields": {},
+  
   "missingFields": [],
+  
   "recommendedRoute": "",
+  
   "reasoning": ""
 }
       
