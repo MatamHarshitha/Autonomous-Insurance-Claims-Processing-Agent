@@ -137,6 +137,7 @@ The system expects the following core fields:
       
 
 ###3. Activate environment
+ 
   Windows:
     
       .venv\Scripts\activate
