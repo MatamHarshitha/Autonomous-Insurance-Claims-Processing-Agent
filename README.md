@@ -124,17 +124,15 @@ project-AI/
         cd Autonomous-Insurance-Claims-Processing-Agent```
 
 ### 2. Create virtual environment
-      ```bash python -m venv .venv```
+       python -m venv .venv
       
 
 ###3. Activate environment
     Windows:
-    
-      ```bash
-            .venv\Scripts\activate```
+      .venv\Scripts\activate
       
     Mac/Linux:
-       ```source .venv/bin/activate```
+       source .venv/bin/activate
 
 ###4. Install dependencies
       ```pip install -r requirements.txt```
