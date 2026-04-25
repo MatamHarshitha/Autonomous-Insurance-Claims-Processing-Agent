@@ -17,9 +17,8 @@ The system processes insurance claim PDFs and performs:
 ---
 
 ---
-project-Structure
+# Project-Structure
 
-│
 
 ├── pdfs/ # PDF files (input documents)
 
@@ -130,20 +129,20 @@ The system expects the following core fields:
 ##  Steps to Run
 
 ### 1. Clone the repository
-    ```bash
-        git clone https://github.com/<your-username>/Autonomous-Insurance-Claims-Processing-Agent.git
-        cd Autonomous-Insurance-Claims-Processing-Agent```
+     git clone https://github.com/<your-username>/Autonomous-Insurance-Claims-Processing-Agent.git
+     cd Autonomous-Insurance-Claims-Processing-Agen
 
 ### 2. Create virtual environment
        python -m venv .venv
       
 
 ###3. Activate environment
-    Windows:
+  Windows:
     
       .venv\Scripts\activate
-      
-    Mac/Linux:
+
+  Mac/Linux:
+  
        source .venv/bin/activate
 
 ###4. Install dependencies
