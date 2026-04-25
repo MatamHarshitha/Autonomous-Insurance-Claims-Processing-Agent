@@ -162,6 +162,7 @@ The system expects the following core fields:
 ###7.Output Format
 
 {
+
   "extractedFields": {},
   
   "missingFields": [],
@@ -169,6 +170,7 @@ The system expects the following core fields:
   "recommendedRoute": "",
   
   "reasoning": ""
+  
 }
       
 
