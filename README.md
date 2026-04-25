@@ -16,6 +16,28 @@ The system processes insurance claim PDFs and performs:
 
 ---
 
+---
+project-Structure
+
+│
+
+├── pdfs/ # PDF files (input documents)
+
+├── claim_agent.py # Main processing logic
+
+├── extract_pdf.py # PDF text extraction
+
+├── config.py # Configuration settings
+
+├── .env # API keys (not pushed to GitHub)
+
+├── .gitignore
+
+└── README.md
+
+
+---
+
 ## Features
 
 ###  PDF Processing
@@ -103,18 +125,7 @@ The system expects the following core fields:
 - Contact Details
 - Estimated Damage
 
----
-project-AI/
-│
-├── claim_agent.py # Main processing logic
-├── extract_pdf.py # PDF text extraction
-├── config.py # Configuration settings
-├── .env # API keys (not pushed to GitHub)
-├── .gitignore
-└── README.md
 
-
----
 
 ##  Steps to Run
 
@@ -129,25 +140,31 @@ project-AI/
 
 ###3. Activate environment
     Windows:
+    
       .venv\Scripts\activate
       
     Mac/Linux:
        source .venv/bin/activate
 
 ###4. Install dependencies
-      ```pip install -r requirements.txt```
+
+      pip install -r requirements.txt
 
 ###5. Setup environment variables
         Create a .env file in the root directory:
+        
           OPENAI_API_KEY=your_api_key_here
+          
+###6. Run the application
+
+      python claim_agent.py
     
-    
+###7.Output Format
+    {
+  "extractedFields": {},
+  "missingFields": [],
+  "recommendedRoute": "",
+  "reasoning": ""
+}
       
 
-## Installation
-
-### 1. Clone the repository
-
-```bash
-git clone <repo-url>
-cd claims-agent
