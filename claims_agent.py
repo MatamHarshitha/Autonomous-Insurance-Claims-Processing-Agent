@@ -1,48 +1,40 @@
 
-
-
 import json
 import re
-import os
 import pdfplumber
-from openai import OpenAI
-from dotenv import load_dotenv
-
-load_dotenv()
-
-client = None
-_api_key = os.getenv("OPENAI_API_KEY")
-
-if _api_key:
-    client = OpenAI(api_key=_api_key)
 
 
 def extract_fields_from_record(record_text):
     fields = {}
 
     patterns = {
-        "Policy Number": r"POLICY NUMBER:\s*([^\n]*)",
-        "Policyholder Name": r"INSURED NAME:\s*([^\n]*)",
-        "Date": r"DATE OF LOSS:\s*([^\n]*)",
-        "Location": r"LOCATION:\s*([^\n]*)",
-        "Description": r"DESCRIPTION(?::| OF ACCIDENT:)\s*([^\n]*)",
-        "Estimated Damage": r"ESTIMATE AMOUNT:\s*\$?([^\n]*)",
-        "Claim Type": r"CLAIM TYPE:\s*([^\n]*)",
-        "Contact Details": r"CONTACT:\s*([^\n]*)",
-        "Time": r"TIME:\s*([^\n]*)"
+         "Policy Number": r"POLICY NUMBER:\s*([A-Z0-9\-]+)",
+    "Policyholder Name": r"INSURED NAME:\s*([A-Za-z ]+)",
+    "Date": r"DATE OF LOSS:\s*([\d/]+)",
+    "Time": r"TIME:\s*([^\n\r]*)",
+    "Location": r"LOCATION:\s*([^\n\r]*)",
+    "Description": r"DESCRIPTION(?: OF ACCIDENT)?:\s*(.*?)(?=ESTIMATE|CLAIM TYPE|$)",
+    "Estimated Damage": r"ESTIMATE AMOUNT:\s*\$?([\d,\.]+)",
+    "Initial Estimate": r"INITIAL ESTIMATE:\s*\$?([\d,\.]+)",   
+    "Claim Type": r"CLAIM TYPE:\s*([A-Za-z ]+)",
+    "Contact Details": r"CONTACT:\s*([^\n\r]*)",
+    "Asset ID": r"ASSET ID:\s*([A-Z0-9\-]+)",                  
+    "Third Parties": r"THIRD PARTIES:\s*([^\n\r]*)",           
+    "Attachments": r"ATTACHMENTS:\s*([^\n\r]*)"
     }
 
     for key, pattern in patterns.items():
-        match = re.search(pattern, record_text, re.IGNORECASE)
+        match = re.search(pattern, record_text, re.IGNORECASE | re.DOTALL)
 
         if match:
             value = match.group(1).strip()
+            value = value.replace("\n", " ").strip()
 
             if (
                 not value or
-                "leave this blank" in value.lower() or
-                "insured name" in value.lower() or
-                "policy number" in value.lower()
+                "acord" in value.lower() or
+                "corporation" in value.lower() or
+                "page" in value.lower()
             ):
                 fields[key] = None
             else:
@@ -53,8 +45,6 @@ def extract_fields_from_record(record_text):
     fields["Asset Type"] = "Vehicle"
 
     return fields
-
-
 
 
 def get_output_template():
@@ -80,20 +70,9 @@ def get_output_template():
 def normalize_output(extracted):
     template = get_output_template()
 
-    mapping = {
-        "Policy Number": "Policy Number",
-        "Policyholder Name": "Policyholder Name",
-        "Date": "Date",
-        "Location": "Location",
-        "Description": "Description",
-        "Estimated Damage": "Estimated Damage",
-        "Claim Type": "Claim Type",
-        "Contact Details": "Contact Details"
-    }
-
-    for key, value in mapping.items():
-        if extracted.get(value):
-            template[key] = extracted[value]
+    for key in template:
+        if key in extracted:
+            template[key] = extracted[key]
 
     if template["Policyholder Name"]:
         template["Claimant"] = template["Policyholder Name"]
@@ -101,58 +80,54 @@ def normalize_output(extracted):
     return template
 
 
-def process_batch_fnol(full_text):
-    records = re.split(r'(?=POLICY NUMBER:)', full_text)
-    all_results = []
+def process_fnol(full_text):
+  
+    extracted = extract_fields_from_record(full_text)
+    normalized = normalize_output(extracted)
 
-    for record in records:
-        if not record.strip():
-            continue
+    mandatory_fields = [
+        "Policy Number",
+        "Policyholder Name",
+        "Description",
+        "Claim Type"
+    ]
 
-        extracted = extract_fields_from_record(record)
-        normalized = normalize_output(extracted)
+    missing = [
+        f for f in mandatory_fields
+        if not normalized.get(f)
+    ]
 
-        mandatory_fields = ["Policy Number",
-    "Policyholder Name",
-    "Description",
-    "Claim Type"]
-        missing =  [
-    f for f in mandatory_fields
-    if not normalized.get(f) or str(normalized.get(f)).strip() == ""
-]
+   
+    description = str(normalized.get("Description", "")).lower()
+    damage_str = str(normalized.get("Estimated Damage", "0")).replace(",", "")
 
-        description = str(normalized.get("Description", "")).lower()
-        damage_str = str(normalized.get("Estimated Damage", "0")).replace(",", "")
+    try:
+        damage = float(damage_str)
+    except:
+        damage = 0
 
-        try:
-            damage = float(damage_str)
-        except ValueError:
-            damage = 0
+    if missing:
+        route = "Manual review"
+        reasoning = "Missing mandatory fields: " + ", ".join(missing)
+    elif any(word in description for word in ["fraud", "inconsistent", "staged"]):
+        route = "Investigation Flag"
+        reasoning = "Suspicious keywords detected in description."
+    elif "injury" in description:
+        route = "Specialist Queue"
+        reasoning = "Claim involves potential injuries."
+    elif damage < 25000:
+        route = "Fast-track"
+        reasoning = f"Damage amount ${damage} is below threshold."
+    else:
+        route = "Standard Review"
+        reasoning = "Claim meets standard processing criteria."
 
-        if missing:
-            route = "Manual review"
-            reasoning = f"Missing mandatory fields: {', '.join(missing)}"
-        elif any(word in description for word in ["fraud", "inconsistent", "staged"]):
-            route = "Investigation Flag"
-            reasoning = "Suspicious keywords detected in description."
-        elif "injury" in str(normalized.get("Claim Type", "")).lower() or "injury" in description:
-            route = "Specialist Queue"
-            reasoning = "Claim involves potential injuries."
-        elif damage < 25000:
-            route = "Fast-track"
-            reasoning = f"Damage amount ${damage} is below the $25,000 threshold."
-        else:
-            route = "Standard Review"
-            reasoning = "Claim meets standard processing criteria."
-
-        all_results.append({
-            "extractedFields": normalized,
-            "missingFields": missing,
-            "recommendedRoute": route,
-            "reasoning": reasoning
-        })
-
-    return all_results
+    return [{
+        "extractedFields": normalized,
+        "missingFields": missing,
+        "recommendedRoute": route,
+        "reasoning": reasoning
+    }]
 
 
 def load_pdf_text(pdf_path):
@@ -161,9 +136,15 @@ def load_pdf_text(pdf_path):
 
 
 if __name__ == "__main__":
-    files = ["ACORD-Automobile-Loss-Notice-12.05.16 (1).pdf", "dummy.pdf"]
+    files = [
+        "ACORD-Automobile-Loss-Notice-12.05.16 (1).pdf",
+        "dummy.pdf"
+    ]
 
     for file_name in files:
+        print(f"\nProcessing file: {file_name}\n")
+
         text = load_pdf_text(file_name)
-        result = process_batch_fnol(text)
+        result = process_fnol(text)
+
         print(json.dumps(result, indent=4))

@@ -9,6 +9,7 @@ __pycache__/
 venv/
 env/
 
+
 # Environment variables (VERY IMPORTANT)
 .env
 

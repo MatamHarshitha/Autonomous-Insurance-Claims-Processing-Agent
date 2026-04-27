@@ -10,12 +10,9 @@ def extract_text_from_pdf(pdf_path):
 
 
 acord_text = extract_text_from_pdf("ACORD-Automobile-Loss-Notice-12.05.16 (1).pdf")
-synapx_text = extract_text_from_pdf("Assessment_Brief_Synapx.pdf")
 dummy_text = extract_text_from_pdf("dummydata.pdf")
 print("ACORD PDF Text:")
 print(acord_text)
 print("\n" + "="*50 + "\n")
-print("Synapx PDF Text:")
-print(synapx_text)
 print("Dummy Data PDF Text:")
 print(dummy_text)
