@@ -26,8 +26,6 @@ The system processes insurance claim PDFs and performs:
 
 ├── extract_pdf.py # PDF text extraction
 
-├── config.py # Configuration settings
-
 ├── .env # API keys (not pushed to GitHub)
 
 ├── .gitignore
